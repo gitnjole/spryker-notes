@@ -66,3 +66,7 @@ interface HelloSprykerFacadeInterface
     public function stringReverser(string $string);  
 }
 ```
+
+### ChatGPT
+
+...
