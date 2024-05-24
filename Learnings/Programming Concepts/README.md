@@ -42,4 +42,4 @@ Experimental chapter where ChatGPT sums it all up "for dummies".
 
 ## Notes
 
-The code snippets are mainly taken from the [Architectural Walkthrough](Tasks/Architectural%20Walkthrough.md) exercise and follow the general module named `HelloSpryker` which takes in a string and reverses it while displaying it on the forntend.
+The code snippets are mainly taken from the [Architectural Walkthrough](https://docs.spryker.com/docs/dg/dev/architecture/tutorial-architectural-walkthrough.html#challenge-description) exercise and follow the general module named `HelloSpryker` which takes in a string and reverses it while displaying it on the forntend.
