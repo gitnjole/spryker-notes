@@ -44,7 +44,6 @@ When a controller calls **getFacade()**, Spryker's DI container ==returns== the 
 
 ## Example
 
-1.
 ```php
 public function indexAction(Request $request)  
 {  
