@@ -14,6 +14,7 @@ To define their transfer objectsâ€™ schemas, XML is used. Therefore, inside theÂ
 - run `console transfer:generate`
 
 Now a DTO has been generated with specified attributes
+
 ### Flow
 
 1. create directory for chosen module in `src/Pyz/Shared`
