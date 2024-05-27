@@ -25,7 +25,7 @@ class HelloSprykerFacade extends AbstractFacade implements HelloSprykerFacadeInt
 }
 ```
 
-- **getFactory()** is a method which ==returns an instance of the factory class==, inhertied from `AbstractFactory`
+- **getFactory()** is a method which ==returns an instance of the [[factory]] class==, inhertied from `AbstractFactory`
 
 When a controller calls **getFacade()**, Spryker's DI container ==returns== the ==instance of the facade== associated with the current module.
 
