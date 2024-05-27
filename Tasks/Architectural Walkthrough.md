@@ -266,6 +266,93 @@ protected function getRouteProvider(): array
 {% endblock %}
 ```
 
+## Transfer objects
+
+[[Transfer objects]] FAQ here.
+
+Create a transfer object using an `xml` file:
+
+`src/Pyz/Shared/HelloSpryker/Transfer/hello_srpyker.transfer.xml`
+```xml
+<?xml version="1.0"?>  
+<transfers xmlns="spryker:transfer-01"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:schemaLocation="spryker:transfer-01 http://static.spryker.com/transfer-01.xsd">  
+  
+    <transfer name="HeloSpryker">  
+        <property name="originalString" type="string" />  
+        <property name="reversedString" type="string" />  
+    </transfer>  
+</transfers>
+```
+
+> [!danger]- Before going further 
+> run `docker/sdk console generate:transfer` to generate a DTO.
+
+## Client
+
+> [!info] Recommended steps 
+> `mkdir -p src/Pyz/Client/HelloSpryker`
+
+
+1. [[Client]]
+
+```php
+client
+```
+
+```php
+interface
+```
+
+2. [[Factory]]
+
+```php
+factory
+```
+
+3. [[Stub]]
+
+```php
+stub
+```
+
+
+#### Create a dependency provider
+
+[[Dependency Provider]] FAQ here.
+
+Create the Dependency provider file inside the `HelloSpryker` module
+
+```php
+namespace Pyz\Client\StringReverse;  
+  
+use Spryker\Client\Kernel\AbstractDependencyProvider;  
+use Spryker\Client\Kernel\Container;  
+  
+class StringReverseDependencyProvider extends AbstractDependencyProvider  
+{  
+    const CLIENT_ZED_REQUEST = 'CLIENT_ZED_REQUEST';  
+  
+    public function provideServiceLayerDependencies(
+	    Container $container) {
+	      
+        $container = $this->addZedRequestClient($container);  
+        return $container;  
+    }  
+  
+    protected function addZedRequestClient(Container $container)  
+    {  
+        $container[static::CLIENT_ZED_REQUEST] = function (
+	        Container $container) {  
+            return $container->getLocator()->zedRequest()->client();  
+        };  
+  
+        return $container;  
+    }  
+}
+```
+
 
 
 
