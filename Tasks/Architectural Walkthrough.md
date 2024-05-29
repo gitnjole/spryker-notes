@@ -108,10 +108,9 @@ When accessing a URL in Zed UI, the action responds to the requests, and then it
 
 #### FacadeInterface and Facade
 
- Facade[[Interface]] will help us keep clean and expandable code, while [[Facade]] will do the heavy lifting.
 
 ```php
-interface StringReverseFacadeInterface  
+interface HelloSprykerFacadeInterface  
 {  
     public function reverseString(
 	    string $string
@@ -119,7 +118,9 @@ interface StringReverseFacadeInterface
 }
 ```
 
-We can implement this inteface inside the Factory like this:
+[[Interface]] will simply ==lay out the required method== that needs to be used.
+
+We can implement this inteface inside the [[Facade]] like this:
 ```php
 public function reverseString(string $string): string  
 {  
@@ -128,6 +129,34 @@ public function reverseString(string $string): string
         ->reverseString($string);  
 }
 ```
+
+- **getFactory** simply returns an instantiated object, in this case an object instance of HelloSprykerBusinessFactory, which contains some code and methods, in this case the following method
+- **createStringReverser** is a method from the factory which simply calls our *Model*, `ReverseString` to do the actual work.
+- **reverseString** is the method from the model class `ReverseString`, so here we're finally calling the method that will perform the duty of reversing a string
+#### Factory
+
+```php
+class HelloSprykerBusinessFactory extends AbstractBusinessFactory  
+{  
+    public function createStringReverser()  
+    {  
+        return new StringReverser();
+    }  
+}
+```
+
+The factory simply creates an instance of a model class below.
+#### Model
+
+```php
+public function reverseString(string $string)  
+{  
+    return strrev($string);  
+}
+```
+
+==To summarize==: 
+	A facade interface lays out which methods are needed to be implemented in the facade. The facade then creates an instance of a business factory. The busines factory then creates an instance of the model class, finally calling the required method to perform a task.
 
 The controller we've built will perform the action:
 ```php
@@ -212,7 +241,7 @@ class IndexController extends AbstractController
 1. Add a new folder inside the created module
 
 > [!info] Recommended steps 
-> `mkdir src/Pyz/Yves/HelloSpryker/Controller`
+> `mkdir src/Pyz/Yves/HelloSpryker/Plugin/Router`
 
 1. Create a RouteProviderPlugin class
 ```php
@@ -240,6 +269,8 @@ class StringReverseRouteProviderPlugin extends AbstractRouteProviderPlugin
 ```
 
 2. Register plugin
+
+`src/Pyz/Yves/Router/`
 ```php
 protected function getRouteProvider(): array
 {
@@ -288,7 +319,37 @@ Create a transfer object using an `xml` file:
 
 > [!danger]- Before going further 
 > run `docker/sdk console generate:transfer` to generate a DTO.
+> 
+#### Update Zed
 
+- update the **Business Factory, Facade and FacadeInterface** to use the new DTO
+
+Update the **Model** like this:
+```php
+public function reverseString(HelloSprykerTransfer $helloSprykerTransfer)  
+{  
+    $reversedString = strrev($helloSprykerTransfer->getOriginalString());  
+    $helloSprykerTransfer->setReversedString($reversedString);  
+  
+    return $reversedString;  
+}
+```
+
+And finally, update the `IndexController`
+```php
+public function indexAction(Request $request)  
+{  
+    $helloSprykerTransfer = new HelloSprykerTransfer();  
+    $helloSprykerTransfer->setOriginalString($request->get('string'));  
+  
+    $reversedString = $this->getFacade()->reverseString($helloSprykerTransfer);  
+  
+    return [  
+        'originalString' => $helloSprykerTransfer->getOriginalString(),  
+        'reversedString' => $helloSprykerTransfer->getReversedString(),  
+    ];  
+}
+```
 ## Client
 
 > [!info] Recommended steps 
@@ -298,25 +359,62 @@ Create a transfer object using an `xml` file:
 1. [[Client]]
 
 ```php
-client
+namespace Pyz\Client\HelloSpryker;  
+  
+use Spryker\Client\Kernel\AbstractClient;  
+  
+class HelloSprykerClient extends AbstractClient implements HelloSprykerClientInterface  
+{  
+  
+}
 ```
 
 ```php
-interface
+namespace Pyz\Client\HelloSpryker;  
+  
+interface HelloSprykerClientInterface  
+{  
+    public function  
+}
 ```
 
 2. [[Factory]]
 
 ```php
-factory
+namespace Pyz\Client\HelloSpryker;  
+  
+use Pyz\Client\HelloSpryker\Zed\HelloSprykerStub;  
+use Spryker\Client\Kernel\AbstractFactory;  
+  
+class HelloSprykerFactory extends AbstractFactory  
+{  
+  
+}
 ```
 
 3. [[Stub]]
 
+Create a new folder `Zed` inside the module, and create two new files, `HelloSprykerStub` and `HelloSprykerStubInterface`
+
 ```php
-stub
+namespace Pyz\Client\HelloSpryker\Zed;  
+  
+use Spryker\Client\ZedRequest\Stub\ZedRequestStub;  
+  
+class HelloSprykerStub extends ZedRequestStub implements HelloSprykerStubInterface  
+{  
+  
+}
 ```
 
+```php
+namespace Pyz\Client\HelloSpryker\Zed;  
+  
+interface HelloSprykerStubInterface  
+{  
+  
+}
+```
 
 #### Create a dependency provider
 
@@ -324,27 +422,26 @@ stub
 
 Create the Dependency provider file inside the `HelloSpryker` module
 
-```php
-namespace Pyz\Client\StringReverse;  
+```php 
+namespace Pyz\Client\HelloSpryker;  
   
 use Spryker\Client\Kernel\AbstractDependencyProvider;  
 use Spryker\Client\Kernel\Container;  
   
-class StringReverseDependencyProvider extends AbstractDependencyProvider  
+class HelloSprykerDependencyProvider extends AbstractDependencyProvider  
 {  
     const CLIENT_ZED_REQUEST = 'CLIENT_ZED_REQUEST';  
   
-    public function provideServiceLayerDependencies(
-	    Container $container) {
-	      
+    public function provideServiceLayerDependencies(Container $container)  
+    {  
         $container = $this->addZedRequestClient($container);  
+  
         return $container;  
     }  
   
     protected function addZedRequestClient(Container $container)  
     {  
-        $container[static::CLIENT_ZED_REQUEST] = function (
-	        Container $container) {  
+        $container[static::CLIENT_ZED_REQUEST] = function (Container $container) {  
             return $container->getLocator()->zedRequest()->client();  
         };  
   
@@ -352,6 +449,42 @@ class StringReverseDependencyProvider extends AbstractDependencyProvider
     }  
 }
 ```
+
+Next, we need to inject the `ZedRequestClient` into the stub using our factory.
+
+```php
+public function createZedHelloSprykerStub()  
+{  
+    return new HelloSprykerStub($this->getZedRequestClient());  
+}  
+  
+protected function getZedRequestClient()  
+{  
+    return $this->getProvidedDependency(
+	    HelloSprykerDependencyProvider::CLIENT_ZED_REQUEST
+	);  
+}
+```
+
+#### Add a method to Stub
+
+Don't forget to first implement the method in the `Interface`.
+
+```php
+public function reverseString(HelloSprykerTransfer $helloSprykerTransfer)  
+{  
+    return $this->zedStub->call(  
+        '/hello-spryker/gateway/reverse-string',  
+        $helloSprykerTransfer  
+    );  
+}
+```
+
+
+> [!info]- This method calls the Zed module HelloSpryker
+> The first parameter in the `call()` method is the endpoint of the request, which is divided into three main sections: `moduleName/controllerName/ActionName`. Here, you call `HelloSpryker`, `GatewayController`, and `ReverseStringAction`.
+> By convention, clients send requests to `GatewayControllers`. The second parameter is the payload of the request, which is always a transfer object, any transfer object.
+
 
 
 
