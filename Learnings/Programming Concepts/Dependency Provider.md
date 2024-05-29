@@ -1,4 +1,4 @@
-**Purpose:** Each module ships with a `DependencyProvider` class, which ==explicitly defines services and external dependencies to other modules==. . The `DependencyProvider` defines dependencies for each layer.
+**Purpose:** Each module ships with a `DependencyProvider` class, which ==explicitly defines services and external dependencies to other modules==. The `DependencyProvider` defines dependencies for each layer.
 
 ### Why?
 
