@@ -5,3 +5,9 @@ Create new file/directory
 
 Select next occurence of matching text
 - `Alt + J`
+
+Switch between open files
+- `Ctrl + Tab`
+
+Comment all lines of code
+- `Ctrl + /`
