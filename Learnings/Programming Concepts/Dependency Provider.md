@@ -26,14 +26,15 @@ class MyBundleDependencyProvider extends AbstractBundleDependencyProvider
  }
 ```
 
-You can access the classes which are provided by the `DependencyProvider` in the **Factory**.
+==You can access the classes which are provided by the `DependencyProvider` in the **Factory**.==
+
 ### Flow
 
 1. Dependencies are defined in the `DependecyProvider` class of each module
 2. Use a method to configure and set dependencies in the `$container`
 3. Dependencies are instantiated only when needed, using closures
 4. Factories within the module can access these dependencies via the container
-   
+ 
 ### Example
 
 ```php
